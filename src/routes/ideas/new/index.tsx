@@ -1,5 +1,7 @@
+import { createIdea } from '#/api/ideas'
+import { useMutation } from '@tanstack/react-query'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useState } from 'react'
+import React, { useState } from 'react'
 
 export const Route = createFileRoute('/ideas/new/')({
   component: NewIdeaPage,
@@ -12,12 +14,43 @@ function NewIdeaPage() {
   const [description, setDescription] = useState('')
   const [tags, setTags] = useState('')
 
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: createIdea,
+    onSuccess: () => {
+      navigate({ to: '/ideas' })
+    },
+  })
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (!title.trim() || !summary.trim() || !description.trim()) {
+      alert('Please fill in all fields')
+      return
+    }
+
+    try {
+      await mutateAsync({
+        title,
+        summary,
+        description,
+        tags: tags
+          .split(',')
+          .map((tag) => tag.trim())
+          .filter((tag) => tag !== ''),
+      })
+    } catch (error) {
+      console.error(error)
+      alert('Something went wrong')
+    }
+  }
+
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">Create New Idea</h1>
       </div>
-      <form className="space-y-2">
+      <form onSubmit={handleSubmit} className="space-y-2">
         <div>
           <label
             htmlFor="title"
@@ -89,10 +122,10 @@ function NewIdeaPage() {
         <div className="mt-5">
           <button
             type="submit"
-
+            disabled={isPending}
             className="block w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-2 rounded-md transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            'Create Idea'
+             {isPending ? 'Creating...' : 'Create Idea'}
           </button>
         </div>
       </form>
