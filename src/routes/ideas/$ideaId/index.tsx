@@ -5,7 +5,6 @@ import {
   useSuspenseQuery,
 } from '@tanstack/react-query'
 import { fetchIdea, deleteIdea } from '#/api/ideas'
-import type React from 'react'
 
 const ideaQueryOptions = (ideaId: string) =>
   queryOptions({
@@ -32,7 +31,7 @@ function IdeaDetailsPage() {
     },
   })
 
-  const handleDelete = async (e: React.FormEvent) => {
+  const handleDelete = async () => {
     const confirmDelete = window.confirm(
       'Are you sure you want to delete this Idea? ',
     )

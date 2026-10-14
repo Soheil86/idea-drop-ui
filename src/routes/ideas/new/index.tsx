@@ -21,7 +21,7 @@ function NewIdeaPage() {
     },
   })
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault()
 
     if (!title.trim() || !summary.trim() || !description.trim()) {
