@@ -82,17 +82,6 @@
       ],
       "createdAt": "2026-10-14T09:16:29.526Z",
       "id": "nAgxSmBGc8Y"
-    },
-    {
-      "title": "Test new idea",
-      "summary": "test",
-      "description": "new idea",
-      "tags": [
-        "idea",
-        "test"
-      ],
-      "createdAt": "2026-10-14T09:20:21.602Z",
-      "id": "h9N6n_8a4ZM"
     }
   ],
   "$schema": "./node_modules/json-server/schema.json"
