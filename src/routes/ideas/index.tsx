@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 import { fetchIdeas } from '#/api/ideas'
 import IdeaCard from '#/components/IdeaCard'
@@ -6,7 +6,7 @@ import IdeaCard from '#/components/IdeaCard'
 const ideasQueryOptions = () =>
   queryOptions({
     queryKey: ['ideas'],
-    queryFn: fetchIdeas,
+    queryFn: () => fetchIdeas(),
   })
 
 export const Route = createFileRoute('/ideas/')({
