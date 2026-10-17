@@ -1,4 +1,7 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { loginUser } from '#/api/auth'
+import { useAuth } from '#/context/AuthContext'
+import { useMutation } from '@tanstack/react-query'
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 
 export const Route = createFileRoute('/(auth)/login/')({
@@ -6,9 +9,29 @@ export const Route = createFileRoute('/(auth)/login/')({
 })
 
 function LoginPage() {
+  const navigate = useNavigate()
+  const { setAccessToken, setUser } = useAuth()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: loginUser,
+    onSuccess: (data) => {
+      setAccessToken(data.accessToken)
+      setUser(data.user)
+      navigate({ to: '/ideas' })
+    },
+    onError: (err: any) => {
+      setError(err.message)
+    },
+  })
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError('')
+    await mutateAsync({ email, password })
+  }
 
   return (
     <div className="max-w-md mx-auto">
@@ -18,7 +41,7 @@ function LoginPage() {
           {error}
         </div>
       )}
-      <form className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4">
         <input
           type="email"
           className="w-full border border-gray rounded-md p-2"
@@ -35,8 +58,11 @@ function LoginPage() {
           onChange={(e) => setPassword(e.target.value)}
           autoComplete="off"
         />
-        <button className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-md w-full disabled:opacity-50">
-          'Login'
+        <button
+          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-md w-full disabled:opacity-50"
+          disabled={isPending}
+        >
+          {isPending ? 'Logging In...' : 'Login'}
         </button>
       </form>
 
