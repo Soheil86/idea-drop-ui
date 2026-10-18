@@ -1,194 +1,122 @@
-Welcome to your new TanStack Start app!
+# 💡 IdeaDrop
 
-# Getting Started
+**Share, explore and build on the best startup ideas and side hustles.**
 
-To run this application:
+IdeaDrop is a full-stack web app where users can sign up, post their ideas, browse what others have shared, and manage their own ideas. This repository contains the **frontend**, a type-safe React single-page application.
+
+🔗 **Live demo:** [idea-drop-ui-two.vercel.app](https://idea-drop-ui-two.vercel.app)
+🛠️ **Backend API:** [Soheil86/idea-drop-api](https://github.com/Soheil86/idea-drop-api)
+
+![React](https://img.shields.io/badge/React_19-20232A?style=flat&logo=react&logoColor=61DAFB)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat&logo=typescript&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-646CFF?style=flat&logo=vite&logoColor=white)
+![TanStack Router](https://img.shields.io/badge/TanStack_Router-FF4154?style=flat&logo=reactrouter&logoColor=white)
+![TanStack Query](https://img.shields.io/badge/TanStack_Query-FF4154?style=flat&logo=reactquery&logoColor=white)
+![Axios](https://img.shields.io/badge/Axios-5A29E4?style=flat&logo=axios&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat&logo=tailwindcss&logoColor=white)
+![Vercel](https://img.shields.io/badge/Deployed_on_Vercel-000000?style=flat&logo=vercel&logoColor=white)
+
+---
+
+## ✨ Features
+
+- **Browse ideas:** a home page with the latest ideas and a full list of all ideas
+- **Idea details:** a dedicated page for each idea, with its description and tags
+- **Create, edit and delete:** full CRUD for ideas through a REST API
+- **User accounts:** register, log in and log out
+- **Ownership rules:** edit and delete controls are only shown to the author of an idea
+- **Persistent sessions:** users stay logged in across page reloads through a silent token refresh
+- **Friendly 404 page** and a responsive layout styled with Tailwind CSS
+
+## 🧰 Built With
+
+| Technology | Purpose |
+|---|---|
+| **React** (via **Vite**) | UI library and a fast development and build toolchain |
+| **TanStack Router** | Type-safe, file-based routing with route loaders |
+| **TanStack Query** | Server-state management: caching, background refetching and mutations |
+| **Axios** | HTTP client with interceptors for authentication |
+| **TypeScript** | End-to-end type safety in strict mode |
+| **Tailwind CSS v4** | Utility-first styling |
+| **Vercel** | Hosting and continuous deployment |
+
+## 🧠 Technical Highlights
+
+### Authentication with access and refresh tokens
+- The short-lived **JWT access token** is kept **in memory only**, not in `localStorage`, which reduces exposure to XSS attacks.
+- The long-lived **refresh token** lives in an **HTTP-only cookie** that JavaScript cannot read, and it is sent automatically with `withCredentials`.
+- An **Axios request interceptor** attaches `Authorization: Bearer <token>` to every request automatically.
+- An **Axios response interceptor** catches `401 Unauthorized` responses, gets a new access token, and **retries the original request transparently**, so the user never notices.
+- On app start, the `AuthProvider` restores the session by calling the refresh endpoint.
+
+### Data loading before render
+Route **loaders** call `queryClient.ensureQueryData(...)`, so data is fetched **before** a page renders. Components then read the same cache with `useSuspenseQuery`. This means:
+- no loading spinners or `if (loading)` checks inside components
+- revisiting a page is **instant**, because data comes from the cache
+- links **preload data on hover** (`defaultPreload: 'intent'`)
+
+The `QueryClient` is passed to every loader through **router context**, so there is a single shared cache.
+
+### Type-safe routing
+TanStack Router generates the route tree from the file system, so links and route params are checked by TypeScript. A typo in `<Link to="...">` is a compile-time error, not a broken link in production.
+
+## 📁 Project Structure
+
+```
+src/
+├── api/            # API functions (ideas, auth) built on the Axios instance
+├── components/     # Reusable UI components (Header, IdeaCard)
+├── context/        # AuthContext: the current user and access token
+├── lib/
+│   ├── axios.ts    # Axios instance and auth interceptors
+│   └── authToken.ts# In-memory access token storage
+├── routes/         # File-based routes (TanStack Router)
+│   ├── __root.tsx          # Root layout, head tags, 404 page
+│   ├── index.tsx           # Home page: latest ideas
+│   ├── (auth)/             # Login and register pages (route group)
+│   └── ideas/
+│       ├── index.tsx       # All ideas
+│       ├── new/            # Create an idea
+│       └── $ideaId/        # Idea details and edit page
+├── types.ts        # Shared TypeScript types
+└── main.tsx        # App entry: QueryClient, router and providers
+```
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js 20 or later
+- The [IdeaDrop API](https://github.com/Soheil86/idea-drop-api) running locally or deployed
+
+### Installation
 
 ```bash
+git clone https://github.com/Soheil86/idea-drop-ui.git
+cd idea-drop-ui
 npm install
-npm run dev
 ```
 
-# Building For Production
+### Environment variables
 
-To build this application for production:
+Create a `.env` file in the project root:
+
+```env
+VITE_API_URL=http://localhost:8000
+```
+
+### Run
 
 ```bash
-npm run build
+npm run dev      # start the dev server at http://localhost:3000
+npm run build    # create a production build
+npm run preview  # preview the production build
+npm run lint     # run ESLint
+npm run format   # format with Prettier and fix lint issues
 ```
 
-## Styling
+## 👤 Author
 
-This project uses [Tailwind CSS](https://tailwindcss.com/) for styling.
+**Soheil Ghanbari**
+GitHub: [@Soheil86](https://github.com/Soheil86)
 
-### Removing Tailwind CSS
-
-If you prefer not to use Tailwind CSS:
-
-1. Remove the demo pages in `src/routes/demo/`
-2. Replace the Tailwind import in `src/styles.css` with your own styles
-3. Remove `tailwindcss()` from the plugins array in `vite.config.ts`
-4. Remove `@tailwindcss/vite` and `tailwindcss` from `package.json`
-
-## Linting & Formatting
-
-
-This project uses [eslint](https://eslint.org/) and [prettier](https://prettier.io/) for linting and formatting. Eslint is configured using [tanstack/eslint-config](https://tanstack.com/config/latest/docs/eslint). The following scripts are available:
-
-```bash
-npm run lint
-npm run format
-npm run check
-```
-
-
-
-## Routing
-
-This project uses [TanStack Router](https://tanstack.com/router) with file-based routing. Routes are managed as files in `src/routes`.
-
-### Adding A Route
-
-To add a new route to your application just add a new file in the `./src/routes` directory.
-
-TanStack will automatically generate the content of the route file for you.
-
-Now that you have two routes you can use a `Link` component to navigate between them.
-
-### Adding Links
-
-To use SPA (Single Page Application) navigation you will need to import the `Link` component from `@tanstack/react-router`.
-
-```tsx
-import { Link } from "@tanstack/react-router";
-```
-
-Then anywhere in your JSX you can use it like so:
-
-```tsx
-<Link to="/about">About</Link>
-```
-
-This will create a link that will navigate to the `/about` route.
-
-More information on the `Link` component can be found in the [Link documentation](https://tanstack.com/router/v1/docs/framework/react/api/router/linkComponent).
-
-### Using A Layout
-
-In the File Based Routing setup the layout is located in `src/routes/__root.tsx`. Anything you add to the root route will appear in all the routes. The route content will appear in the JSX where you render `{children}` in the `shellComponent`.
-
-Here is an example layout that includes a header:
-
-```tsx
-import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
-
-export const Route = createRootRoute({
-  head: () => ({
-    meta: [
-      { charSet: 'utf-8' },
-      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { title: 'My App' },
-    ],
-  }),
-  shellComponent: ({ children }) => (
-    <html lang="en">
-      <head>
-        <HeadContent />
-      </head>
-      <body>
-        <header>
-          <nav>
-            <Link to="/">Home</Link>
-            <Link to="/about">About</Link>
-          </nav>
-        </header>
-        {children}
-        <Scripts />
-      </body>
-    </html>
-  ),
-})
-```
-
-More information on layouts can be found in the [Layouts documentation](https://tanstack.com/router/latest/docs/framework/react/guide/routing-concepts#layouts).
-
-## Server Functions
-
-TanStack Start provides server functions that allow you to write server-side code that seamlessly integrates with your client components.
-
-```tsx
-import { createServerFn } from '@tanstack/react-start'
-
-const getServerTime = createServerFn({
-  method: 'GET',
-}).handler(async () => {
-  return new Date().toISOString()
-})
-
-// Use in a component
-function MyComponent() {
-  const [time, setTime] = useState('')
-  
-  useEffect(() => {
-    getServerTime().then(setTime)
-  }, [])
-  
-  return <div>Server time: {time}</div>
-}
-```
-
-## API Routes
-
-You can create API routes by using the `server` property in your route definitions:
-
-```tsx
-import { createFileRoute } from '@tanstack/react-router'
-import { json } from '@tanstack/react-start'
-
-export const Route = createFileRoute('/api/hello')({
-  server: {
-    handlers: {
-      GET: () => json({ message: 'Hello, World!' }),
-    },
-  },
-})
-```
-
-## Data Fetching
-
-There are multiple ways to fetch data in your application. You can use TanStack Query to fetch data from a server. But you can also use the `loader` functionality built into TanStack Router to load the data for a route before it's rendered.
-
-For example:
-
-```tsx
-import { createFileRoute } from '@tanstack/react-router'
-
-export const Route = createFileRoute('/people')({
-  loader: async () => {
-    const response = await fetch('https://swapi.dev/api/people')
-    return response.json()
-  },
-  component: PeopleComponent,
-})
-
-function PeopleComponent() {
-  const data = Route.useLoaderData()
-  return (
-    <ul>
-      {data.results.map((person) => (
-        <li key={person.name}>{person.name}</li>
-      ))}
-    </ul>
-  )
-}
-```
-
-Loaders simplify your data fetching logic dramatically. Check out more information in the [Loader documentation](https://tanstack.com/router/latest/docs/framework/react/guide/data-loading#loader-parameters).
-
-
-
-# Learn More
-
-You can learn more about all of the offerings from TanStack in the [TanStack documentation](https://tanstack.com).
-
-For TanStack Start specific documentation, visit [TanStack Start](https://tanstack.com/start).
+If you have feedback or would like to get in touch, feel free to open an issue or reach out through GitHub.
